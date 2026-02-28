@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المواعيد | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-confirmed {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-completed {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-8">
+                    <a href="/" class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                        <i class="fa-solid fa-notes-medical text-2xl"></i> عيادتي
+                    </a>
+                    <nav class="hidden md:flex space-x-4 space-x-reverse">
+                        <a href="/"
+                            class="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md font-medium transition">سجل
+                            المرضى</a>
+                        <a href="/appointments.html"
+                            class="text-blue-600 px-3 py-2 rounded-md font-bold bg-blue-50 transition">إدارة
+                            المواعيد</a>
+                    </nav>
+                </div>
+                <div>
+                    <a href="/book.html" target="_blank"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> حجز جديد
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">مواعيد اليوم: <span id="currentDateDisplay"
+                        class="text-blue-600"></span></h1>
+                <p class="text-gray-500 mt-1 flex items-center gap-2">
+                    إدارة حالات المرضى وجدول العيادة اليومي
+                    <span id="lastSyncTime"
+                        class="text-xs text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full font-medium">تحديث تلقائي
+                        مفعل...</span>
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                <label class="text-gray-700 font-medium whitespace-nowrap hidden sm:inline">تصفية بالتاريخ:</label>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <input type="date" id="dateFilter"
+                        class="flex-1 sm:flex-none border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 text-center">
+                    <button id="todayBtn"
+                        class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium transition">اليوم</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-5 border-r-4 border-blue-500 flex flex-col">
+                <div class="text-gray-500 text-sm mb-1 font-medium">إجمالي المواعيد</div>
+                <div class="text-3xl font-bold text-gray-800" id="statTotal">0</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5 border-r-4 border-green-500 flex flex-col">
+                <div class="text-gray-500 text-sm mb-1 font-medium">المكتملة</div>
+                <div class="text-3xl font-bold text-gray-800" id="statCompleted">0</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5 border-r-4 border-yellow-500 flex flex-col">
+                <div class="text-gray-500 text-sm mb-1 font-medium">قيد الانتظار</div>
+                <div class="text-3xl font-bold text-gray-800" id="statPending">0</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5 border-r-4 border-red-500 flex flex-col">
+                <div class="text-gray-500 text-sm mb-1 font-medium">الملغاة</div>
+                <div class="text-3xl font-bold text-gray-800" id="statCancelled">0</div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+                <table class="w-full text-right" id="appointmentsTable">
+                    <thead class="bg-gray-50 text-gray-600 text-sm border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold whitespace-nowrap">الوقت</th>
+                            <th class="px-6 py-4 font-semibold whitespace-nowrap">المريض</th>
+                            <th class="px-6 py-4 font-semibold whitespace-nowrap">نوع الكشف</th>
+                            <th class="px-6 py-4 font-semibold hidden md:table-cell">ملاحظات</th>
+                            <th class="px-6 py-4 font-semibold text-center whitespace-nowrap">الحالة</th>
+                            <th class="px-6 py-4 font-semibold text-center whitespace-nowrap">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-sm" id="tableBody">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="loading" class="text-center py-16 hidden">
+                <i class="fa-solid fa-spinner fa-spin text-blue-500 text-4xl"></i>
+                <p class="text-gray-500 text-lg mt-4 font-medium">جاري تحميل المواعيد...</p>
+            </div>
+
+            <div id="noData" class="text-center py-20 hidden">
+                <div
+                    class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-5 border border-gray-100 shadow-sm">
+                    <i class="fa-regular fa-calendar-xmark text-gray-400 text-3xl"></i>
+                </div>
+                <p class="text-gray-600 text-xl font-medium">لا توجد مواعيد في هذا اليوم.</p>
+                <p class="text-gray-400 mt-2">لا توجد حجوزات مسجلة في التاريخ المحدد أعلاه.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/appointments.js"></script>
+</body>
+
+</html>

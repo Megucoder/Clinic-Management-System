@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة المريض | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-confirmed {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-completed {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="/" class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                        <i class="fa-solid fa-notes-medical text-2xl"></i> عيادتي
+                    </a>
+                </div>
+                <div>
+                    <a href="/book.html"
+                        class="text-blue-600 hover:text-blue-800 font-medium transition flex items-center gap-2">
+                        حجز موعد جديد <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex flex-col items-center">
+
+        <!-- Login Section -->
+        <div id="loginSection" class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 transform transition-all">
+            <div class="text-center mb-6">
+                <div
+                    class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">بوابة المريض</h1>
+                <p class="text-gray-500 mt-2 text-sm">أدخل رقم هاتفك لعرض مواعيدك السابقة والقادمة</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف المستخدم في الحجز</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-mobile-screen text-gray-400"></i>
+                        </div>
+                        <input type="tel" id="loginPhone" required dir="ltr"
+                            class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm text-right text-lg"
+                            placeholder="05xxxxxxxx">
+                    </div>
+                </div>
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex justify-center items-center gap-2 mt-4 cursor-pointer disabled:opacity-75">
+                    دخول
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard Section (Hidden Initially) -->
+        <div id="dashboardSection" class="w-full hidden">
+
+            <div
+                class="bg-blue-600 rounded-2xl shadow-lg p-6 mb-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold" id="welcomeName">أهلاً بك</h2>
+                    <p class="text-blue-100 mt-1">هنا تجد سجل مواعيدك بالكامل.</p>
+                </div>
+                <button id="logoutBtn"
+                    class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition text-sm">
+                    <i class="fa-solid fa-right-from-bracket ml-2"></i> تسجيل الخروج
+                </button>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">سجل المواعيد</h3>
+
+            <div id="loading" class="text-center py-12 hidden">
+                <i class="fa-solid fa-spinner fa-spin text-blue-500 text-4xl"></i>
+            </div>
+
+            <div id="noData" class="text-center py-12 hidden bg-white rounded-xl shadow-sm">
+                <div
+                    class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                    <i class="fa-regular fa-calendar-xmark text-2xl"></i>
+                </div>
+                <p class="text-gray-600 font-medium text-lg">لا توجد مواعيد سابقة مسجلة بهذا الرقم.</p>
+                <a href="/book.html" class="inline-block mt-4 text-blue-600 hover:underline">احجز موعدك الأول الآن</a>
+            </div>
+
+            <div id="appointmentsList" class="space-y-4">
+                <!-- Appointments Cards will be injected here -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/patient-portal.js"></script>
+</body>
+
+</html>

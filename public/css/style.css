@@ -1,0 +1,414 @@
+:root {
+    --primary: #4F46E5;
+    --primary-light: #818CF8;
+    --primary-dark: #3730A3;
+    --secondary: #10B981;
+    --background: #F3F4F6;
+    --surface: #FFFFFF;
+    --surface-glass: rgba(255, 255, 255, 0.7);
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --border: rgba(229, 231, 235, 0.5);
+    --danger: #EF4444;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: var(--background);
+    background-image:
+        radial-gradient(at 40% 20%, hsla(228, 100%, 74%, 1) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 1) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 1) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    text-decoration: none;
+}
+
+.logo-icon {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: var(--shadow-md);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    width: 100%;
+    flex: 1;
+}
+
+/* Glassmorphism Card Base */
+.card {
+    background: var(--surface-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.4);
+}
+
+.btn-secondary {
+    background: var(--surface);
+    color: var(--text-main);
+    border: 1px solid #D1D5DB;
+}
+
+.btn-secondary:hover {
+    background: #F9FAFB;
+    border-color: #9CA3AF;
+}
+
+/* Forms and Inputs */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: var(--surface);
+    color: var(--text-main);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Header Controls */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-glass);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    outline: none;
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+    background: var(--surface);
+}
+
+.search-bar i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+/* Grid Layouts */
+.patients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Profile specific styles */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+}
+
+.profile-info h1 {
+    font-size: 1.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.profile-info p {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* Prescriptions Timeline */
+.timeline {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-top: 1.5rem;
+    border-left: 2px solid #E5E7EB;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.9rem;
+    top: 0;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-date {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.timeline-content {
+    background: var(--surface);
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid #E5E7EB;
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-content h4 {
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+}
+
+.medication-list {
+    background: #F9FAFB;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 0.75rem;
+    white-space: pre-wrap;
+    font-family: monospace;
+    color: var(--text-main);
+    border: 1px solid #F3F4F6;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(17, 24, 39, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: var(--surface);
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 500px;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--danger);
+}
+
+/* Utilities */
+.text-center {
+    text-align: center;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #E0E7FF;
+    color: var(--primary-dark);
+}

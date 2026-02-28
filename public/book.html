@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز موعد | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .slot-btn {
+            transition: all 0.3s ease;
+        }
+
+        .slot-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .slot-selected {
+            background-color: #2563eb !important;
+            color: white !important;
+            border-color: #2563eb !important;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+
+        <!-- Sidebar Info -->
+        <div class="md:w-1/3 bg-blue-600 text-white p-8 flex flex-col justify-between">
+            <div>
+                <a href="/" class="flex items-center gap-3 text-2xl font-bold mb-8 hover:text-blue-200 transition">
+                    <i class="fa-solid fa-notes-medical"></i> عيادتي
+                </a>
+                <h2 class="text-3xl font-bold mb-4">احجز موعدك الآن</h2>
+                <p class="text-blue-100 mb-6 leading-relaxed">نحن هنا لتقديم أفضل رعاية صحية لك ولعائلتك. اختر الوقت
+                    المناسب لك وسنقوم بتأكيد الموعد فوراً.</p>
+
+                <div class="space-y-4 text-sm md:text-base">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-location-dot w-5 text-center"></i>
+                        <span>شارع الطب، مبنى الصحة، الطابق الثاني</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-phone w-5 text-center"></i>
+                        <span dir="ltr">+966 50 123 4567</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-regular fa-clock w-5 text-center"></i>
+                        <span>الأحد - الخميس (09:00 ص - 05:00 م)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-xs md:text-sm text-blue-200">
+                &copy; <span id="currentYear"></span> نظام حجز المواعيد. جميع الحقوق محفوظة.
+            </div>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="md:w-2/3 p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">تفاصيل الحجز</h3>
+
+            <form id="bookingForm" class="space-y-6">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الاسم الكامل <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-user text-gray-400"></i>
+                            </div>
+                            <input type="text" id="patientName" required
+                                class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
+                                placeholder="أدخل اسمك الثلاثي">
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-mobile-screen text-gray-400"></i>
+                            </div>
+                            <input type="tel" id="patientPhone" required dir="ltr"
+                                class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm text-right"
+                                placeholder="05xxxxxxxx">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع الكشف <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-stethoscope text-gray-400"></i>
+                            </div>
+                            <select id="appointmentType" required
+                                class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm appearance-none bg-white">
+                                <option value="" disabled selected>اختر نوع الكشف</option>
+                                <option value="كشف عام">كشف عام</option>
+                                <option value="استشارة">استشارة</option>
+                                <option value="متابعة">متابعة</option>
+                                <option value="طوارئ">طوارئ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Date Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الموعد <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fa-regular fa-calendar text-gray-400"></i>
+                            </div>
+                            <input type="text" id="appointmentDate" required
+                                class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm bg-white cursor-pointer"
+                                placeholder="اختر يوم الموعد" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Slots -->
+                <div id="timeSlotsContainer" class="hidden border-t pt-4 border-gray-100">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">الوقت المتاح <span
+                            class="text-red-500">*</span></label>
+
+                    <div id="loadingSlots" class="text-center py-4 hidden">
+                        <i class="fa-solid fa-spinner fa-spin text-blue-500 text-2xl"></i>
+                        <p class="text-sm text-gray-500 mt-2">جاري البحث عن أوقات متاحة...</p>
+                    </div>
+
+                    <div id="noSlotsMsg"
+                        class="hidden text-center py-4 bg-red-50 text-red-600 rounded-lg border border-red-100">
+                        <i class="fa-regular fa-calendar-xmark mb-2 text-xl"></i>
+                        <p>عذراً، لا توجد مواعيد متاحة في هذا اليوم.</p>
+                    </div>
+
+                    <div id="slotsGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                        <!-- Slots will be injected here -->
+                    </div>
+                    <input type="hidden" id="selectedTime" required>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات إضافية (اختياري)</label>
+                    <textarea id="appointmentNotes" rows="2"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm resize-none"
+                        placeholder="هل تعاني من أمراض مزمنة أو لديك استفسار محدد؟"></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-4 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed">
+                    <span>تأكيد الحجز</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
+    <script src="/js/book.js"></script>
+</body>
+
+</html>

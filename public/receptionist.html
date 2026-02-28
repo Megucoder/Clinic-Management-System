@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة المساعد | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-confirmed {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 shadow-md sticky top-0 z-10 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="/" class="flex items-center gap-2 text-xl font-bold text-white hover:text-indigo-100">
+                        <i class="fa-solid fa-headset text-2xl"></i> بوابة الاستقبال (المساعد)
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="/records.html"
+                        class="flex items-center gap-2 text-sm font-semibold text-indigo-100 hover:text-white transition-colors bg-indigo-700 px-4 py-2 rounded-lg">
+                        <i class="fa-solid fa-folder-open"></i> أرشيف المرضى
+                    </a>
+                    <div id="crowdAlert"
+                        class="hidden bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i> العيادة مزدحمة!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-6">
+
+        <!-- Left Side: Book New Patient -->
+        <div class="lg:w-1/3 flex flex-col gap-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b flex items-center justify-between">
+                    تسجيل مريض جديد
+                    <a href="/book.html" target="_blank"
+                        class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                        فتح التقويم الكامل <i class="fa-solid fa-up-right-from-square"></i>
+                    </a>
+                </h2>
+
+                <form id="quickBookForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف <span
+                                class="text-red-500">*</span></label>
+                        <input type="tel" id="recPhone" required dir="ltr"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                            placeholder="05xxxxxxxx">
+                        <p id="oldPatientBadge" class="hidden text-xs text-green-600 mt-1 font-bold"><i
+                                class="fa-solid fa-check-circle"></i> مريض سابق - تم جلب البيانات تلقائياً</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">اسم المريض <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="recName" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <!-- New Patient Info Fields -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الميلاد</label>
+                            <input type="date" id="recDob"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-center text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">الزمرة الدموية</label>
+                            <select id="recBloodType"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <option value="">غير محدد</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">الحساسية المفرطة</label>
+                        <input type="text" id="recAllergies" placeholder="مثل: البنسلين (اتركه فارغاً إن لم يوجد)"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ</label>
+                        <input type="date" id="recDate" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-center text-gray-700">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">الوقت</label>
+                        <select id="recTime" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                            <option value="">اختر التاريخ أولاً...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">نوع الكشف</label>
+                        <select id="recType" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white">
+                            <option value="كشف عام">كشف عام</option>
+                            <option value="استشارة">استشارة</option>
+                            <option value="متابعة">متابعة</option>
+                            <option value="طوارئ">طوارئ</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="recSubmitBtn"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition disabled:opacity-70">
+                        حجز الموعد
+                    </button>
+                    <!-- Note: Medical details are strictly NOT collected or displayed here -->
+                </form>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-sm text-blue-800">
+                <p class="font-bold flex items-center gap-2 mb-1"><i class="fa-solid fa-shield-halved"></i> خصوصية
+                    المرضى</p>
+                <p>للأهمية: لا يمكنك الاطلاع على السجل الطبي أو الوصفات للمرضى. هذا من صلاحيات الطبيب المعالج فقط.</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Today's Waiting List -->
+        <div class="lg:w-2/3 flex flex-col">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full">
+
+                <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-indigo-600"></i> صالة الانتظار اليوم
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1" id="lastSyncTime">تحديث تلقائي مفعل...</p>
+                    </div>
+                    <div class="text-center bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm">
+                        <p class="text-xs text-gray-500 font-medium">المرضى في الانتظار</p>
+                        <p class="text-2xl font-bold text-indigo-600" id="pendingCount">0</p>
+                    </div>
+                </div>
+
+                <div class="p-0 overflow-x-auto">
+                    <table class="w-full text-right">
+                        <thead class="bg-white border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4 font-bold">الوقت</th>
+                                <th class="px-6 py-4 font-bold">المريض</th>
+                                <th class="px-6 py-4 font-bold">النوع</th>
+                                <th class="px-6 py-4 font-bold text-center">الحالة</th>
+                                <th class="px-6 py-4 font-bold text-center">الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queueTableBody" class="divide-y divide-gray-100 text-sm">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+
+                    <div id="loadingQueue" class="text-center py-10 hidden">
+                        <i class="fa-solid fa-spinner fa-spin text-indigo-500 text-3xl"></i>
+                    </div>
+
+                    <div id="emptyQueue" class="text-center py-16 hidden">
+                        <i class="fa-regular fa-face-smile text-gray-300 text-5xl mb-3"></i>
+                        <p class="text-gray-500 font-medium">لا يوجد مرضى في صالة الانتظار حالياً.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/receptionist.js"></script>
+</body>
+
+</html>
