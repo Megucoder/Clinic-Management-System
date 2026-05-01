@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - الصفحة غير موجودة</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #3730A3;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif !important;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #F8FAFC;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(228, 100%, 95%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(189, 100%, 95%, 1) 0px, transparent 50%);
+            padding: 2rem;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Medical Cross Animation Background */
+        .bg-icon {
+            position: absolute;
+            color: var(--primary);
+            opacity: 0.05;
+            z-index: -1;
+            font-size: 5rem;
+        }
+
+        .icon-1 { top: -50px; left: -50px; transform: rotate(15deg); }
+        .icon-2 { bottom: -50px; right: -50px; transform: rotate(-15deg); }
+
+        .error-code {
+            font-size: 10rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), #818CF8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 15px rgba(79, 70, 229, 0.2));
+            animation: pulse 3s infinite;
+        }
+
+        .error-content {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 3rem 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .message-text {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 1rem;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-home:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        @media (max-width: 480px) {
+            .error-code { font-size: 7rem; }
+            .message-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <i class="fa-solid fa-notes-medical bg-icon icon-1"></i>
+        <i class="fa-solid fa-stethoscope bg-icon icon-2"></i>
+        
+        <div class="error-code">404</div>
+        <div class="error-content">
+            <h1 class="message-title">نأسف، لم نجد هذه الصفحة</h1>
+            <p class="message-text">
+                الصفحة التي تحاول الوصول إليها غير موجودة أو تم نقلها. 
+                قد يكون هناك خطأ في الرابط أو أن الصفحة قد تمت إزالتها.
+            </p>
+            <a href="/" class="btn-home">
+                <i class="fa-solid fa-house-medical"></i> العودة للرئيسية
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

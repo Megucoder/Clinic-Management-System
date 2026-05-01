@@ -38,18 +38,14 @@
             <div class="logo-icon"><i class="fa-solid fa-notes-medical"></i></div>
             عيادتي
         </a>
-        <div style="display: flex; gap: 1rem;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
             <a href="/patient-portal.html" class="btn btn-primary"
                 style="background-color: transparent; color: var(--primary-dark); border: 1px solid var(--primary-dark); text-decoration: none; align-items: center; display: flex;">
                 <i class="fa-solid fa-user-circle" style="margin-left: 0.5rem;"></i> بوابة المريض
             </a>
-            <a href="/appointments.html" class="btn btn-primary"
+            <a href="/doctor/appointments.html" class="btn btn-primary"
                 style="background-color: var(--primary-dark); text-decoration: none; align-items: center; display: flex;">
                 <i class="fa-solid fa-calendar-check" style="margin-left: 0.5rem;"></i> إدارة المواعيد
-            </a>
-            <a href="/records.html" class="btn btn-secondary"
-                style="text-decoration: none; align-items: center; display: flex;">
-                <i class="fa-solid fa-folder-open" style="margin-left: 0.5rem;"></i> أرشيف المرضى
             </a>
             <button class="btn btn-primary" onclick="openModal('addPatientModal')">
                 <i class="fa-solid fa-plus"></i> مريض جديد
@@ -65,8 +61,8 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
             <!-- Doctor Role -->
-            <a href="/appointments.html" style="text-decoration: none; display: block;">
-                <div style="background: white; border-radius: 1rem; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent; transition: all 0.3s ease; cursor: pointer;"
+            <a href="/login.html" style="text-decoration: none; display: block; height: 100%;">
+                <div style="background: white; border-radius: 1rem; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent; transition: all 0.3s ease; cursor: pointer; height: 100%; box-sizing: border-box;"
                     onmouseover="this.style.borderColor='var(--primary-color)'"
                     onmouseout="this.style.borderColor='transparent'">
                     <div
@@ -80,8 +76,9 @@
             </a>
 
             <!-- Receptionist Role -->
-            <a href="/receptionist.html" style="text-decoration: none; display: block;">
-                <div style="background: white; border-radius: 1rem; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent; transition: all 0.3s ease; cursor: pointer;"
+            <a href="/receptionist/dashboard.html" onclick="localStorage.setItem('role', 'receptionist');"
+                style="text-decoration: none; display: block; height: 100%;">
+                <div style="background: white; border-radius: 1rem; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid transparent; transition: all 0.3s ease; cursor: pointer; height: 100%; box-sizing: border-box;"
                     onmouseover="this.style.borderColor='#4f46e5'" onmouseout="this.style.borderColor='transparent'">
                     <div
                         style="width: 80px; height: 80px; background: rgba(79, 70, 229, 0.1); color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem;">
@@ -124,10 +121,7 @@
                         <input type="tel" id="patientPhone" class="form-control">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>التاريخ المرضي (اختياري)</label>
-                    <textarea id="patientHistory" class="form-control" placeholder="أمراض مزمنة، حساسيات..."></textarea>
-                </div>
+
                 <button type="submit" class="btn btn-primary"
                     style="width: 100%; justify-content: center; margin-top: 1rem;">
                     حفظ بيانات المريض

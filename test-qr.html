@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div id="qrcode"></div>
+<script>
+    try {
+        var str = "RX-47 | محمد عبد الله محمد سيف الدين عبد الرحمن محمود | 05/03/2026";
+        new QRCode(document.getElementById("qrcode"), {
+            text: str,
+            correctLevel: QRCode.CorrectLevel.L
+        });
+        console.log("Success string");
+    } catch(e) { console.error("Error string: " + e.message); }
+
+    try {
+        var str = unescape(encodeURIComponent("RX-47 | محمد عبد الله محمد سيف الدين عبد الرحمن محمود | 05/03/2026"));
+        new QRCode(document.getElementById("qrcode"), {
+            text: str,
+            correctLevel: QRCode.CorrectLevel.L
+        });
+        console.log("Success unescape");
+    } catch(e) { console.error("Error unescape: " + e.message); }
+</script>
+</body>
+</html>

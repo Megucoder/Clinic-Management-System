@@ -143,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <ul class="text-gray-500 text-sm space-y-1">
                             <li><i class="fa-regular fa-calendar w-4"></i> ${appDateStr}</li>
                             <li><i class="fa-regular fa-clock w-4"></i> الساعة ${time12}</li>
-                            ${app.notes ? `<li class="text-gray-400 mt-2 text-xs line-clamp-2"><i class="fa-regular fa-comment w-4"></i> ${app.notes}</li>` : ''}
                         </ul>
                     </div>
                 </div>

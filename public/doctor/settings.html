@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات النظام | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/doctor-nav.js"></script>
+
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-gear ml-2 text-indigo-600"></i> إعدادات النظام</h1>
+            <p class="text-gray-500 mt-1">تكوين العيادة، النسخ الاحتياطي وإدارة البيانات.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Backup Settings -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">النسخ الاحتياطي</h2>
+                </div>
+                <p class="text-gray-600 text-sm mb-6">قم بتنزيل نسخة كاملة من قاعدة البيانات (`clinic.db`) للحفاظ على سجلات المرضى والبيانات المالية آمنة.</p>
+                
+                <button onclick="downloadBackup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> تنزيل قاعدة البيانات
+                </button>
+            </div>
+
+            <!-- Working Hours (Placeholder for future) -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 opacity-60">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">أوقات العمل والعطل</h2>
+                </div>
+                <p class="text-gray-600 text-sm mb-6">قريباً: ضبط أيام وأوقات العمل والعطل الرسمية ليتم تطبيقها على حجز المواعيد تلقائياً.</p>
+                
+                <button disabled title="قريباً" class="w-full bg-gray-200 text-gray-500 font-bold py-3 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock"></i> ميزة قادمة
+                </button>
+            </div>
+            
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        axios.interceptors.request.use(config => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+            return config;
+        });
+
+        async function downloadBackup() {
+            try {
+                // To download files via axios requires responseType: 'blob'
+                const response = await axios.get('/api/backup-db', { responseType: 'blob' });
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `clinic_backup_${new Date().toISOString().split('T')[0]}.db`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'تم تنزيل النسخة الاحتياطية بنجاح',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            } catch(e) {
+                Swal.fire('خطأ', 'فشل في تحميل قاعدة البيانات', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

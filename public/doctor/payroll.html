@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الرواتب | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* Prevent SweetAlert layout shift (Logout button moving up) */
+        html.swal2-height-auto, body.swal2-height-auto {
+            height: 100vh !important;
+        }
+        body.swal2-shown {
+            padding-right: 0 !important;
+        }
+
+        /* Sidebar transition */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        @media (max-width: 1024px) {
+            #sidebar {
+                position: fixed;
+                z-index: 40;
+                transform: translateX(100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar"
+        class="bg-indigo-900 text-white w-64 flex-shrink-0 h-full flex flex-col shadow-xl">
+        <div class="p-6 border-b border-indigo-800 flex items-center justify-between">
+            <a href="javascript:void(0)" onclick="window.goHome()" class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-stethoscope"></i> عيادتي
+            </a>
+            <button id="closeSidebarBtn" class="lg:hidden text-indigo-300 hover:text-white">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-4">
+            <p class="text-indigo-300 text-xs uppercase tracking-wider mb-2 font-bold px-2" id="doctorNameLabel">مرحباً</p>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+            <a href="appointments.html"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                <i class="fa-regular fa-calendar-check w-5 text-center"></i> المواعيد
+            </a>
+            <a href="records.html"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                <i class="fa-solid fa-folder-open w-5 text-center"></i> سجلات المرضى
+            </a>
+            <a href="finances.html"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg text-indigo-100 hover:bg-indigo-800 hover:text-white transition">
+                <i class="fa-solid fa-sack-dollar w-5 text-center"></i> المالية
+            </a>
+            <a href="payroll.html"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg bg-indigo-800 text-white font-medium transition">
+                <i class="fa-solid fa-users w-5 text-center"></i> العمال والرواتب
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-indigo-800">
+            <button onclick="logoutUser()"
+                class="flex items-center gap-3 w-full px-3 py-3 rounded-lg text-indigo-100 hover:bg-red-600 hover:text-white transition">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> تسجيل الخروج
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <!-- Topbar -->
+        <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10 shrink-0">
+            <div class="flex items-center gap-4">
+                <button id="openSidebarBtn" class="p-2 mr-[-8px] text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg lg:hidden">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h2 class="text-xl font-bold text-gray-800 hidden sm:block">إدارة العمال والرواتب</h2>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Area -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
+            
+            <!-- Controls -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div class="flex items-center gap-3">
+                    <button id="addWorkerBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> إضافة عامل جديد
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
+                    <span class="text-sm text-gray-500 font-medium">الشهر المالي:</span>
+                    <input type="month" id="payrollMonth" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                </div>
+            </div>
+
+            <!-- Stats/Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">إجمالي العمال المضافين</p>
+                        <p class="text-2xl font-bold text-gray-800" id="statWorkers">0</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">إجمالي الرواتب المستحقة</p>
+                        <p class="text-2xl font-bold text-gray-800"><span id="statUnpaid">0</span> <span class="text-sm font-normal text-gray-500">د.ج</span></p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">إجمالي الرواتب المدفوعة</p>
+                        <p class="text-2xl font-bold text-gray-800"><span id="statPaid">0</span> <span class="text-sm font-normal text-gray-500">د.ج</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payroll Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h3 class="text-lg font-bold text-gray-800">تفاصيل الرواتب</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right align-middle">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider font-bold">
+                            <tr>
+                                <th class="px-6 py-4">اسم العامل</th>
+                                <th class="px-6 py-4">الوظيفة</th>
+                                <th class="px-6 py-4">الأجر اليومي</th>
+                                <th class="px-6 py-4 text-center">أيام الحضور المؤكدة</th>
+                                <th class="px-6 py-4">الراتب المستحق</th>
+                                <th class="px-6 py-4 text-center">حالة الدفع</th>
+                                <th class="px-6 py-4 text-center">إدارة الحساب</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payrollTableBody" class="divide-y divide-gray-100 text-sm">
+                            <tr>
+                                <td colspan="6" class="px-6 py-10 text-center text-gray-500">جاري التحميل...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        window.goHome = () => {
+            const isDoctor = localStorage.getItem('doctor_session') === 'true';
+            const isReceptionist = localStorage.getItem('role') === 'receptionist';
+            if (isDoctor) window.location.href = '/doctor/appointments.html';
+            else if (isReceptionist) window.location.href = '/receptionist/dashboard.html';
+            else window.location.href = '/';
+        };
+    </script>
+    <script src="/js/payroll.js"></script>
+</body>
+</html>

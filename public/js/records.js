@@ -1,5 +1,13 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api'; // Use relative path for production readiness
 
+// Global Axios Interceptor for Doctor Authentication
+axios.interceptors.request.use(config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 let currentPage = 1;
 let currentSearch = '';
 let isLastPage = false;
@@ -45,7 +53,7 @@ function renderPatients(patients, append = false) {
     const html = patients.map(p => {
         const age = calculateAge(p.age, p.dob);
         return `
-            <a href="/patient.html?id=${p.id}" class="patient-card">
+            <a href="/doctor/patient.html?id=${p.id}" class="patient-card">
                 <div class="patient-info">
                     <h3><i class="fa-solid fa-user-circle" style="color: var(--primary-color);"></i> ${p.name}</h3>
                     <p>

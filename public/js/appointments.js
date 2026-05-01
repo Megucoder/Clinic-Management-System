@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
+    localStorage.setItem('role', 'doctor');
+
+    // Global Axios Interceptor for Doctor Authentication
+    axios.interceptors.request.use(config => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    });
+
+    let currentAppointments = [];
+    let activeFilter = 'all';
+    let pollingTimer = null;
+    const SYNC_INTERVAL = 10000; // 10 seconds
+
     const tableBody = document.getElementById('tableBody');
     const loading = document.getElementById('loading');
     const noData = document.getElementById('noData');
@@ -45,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await axios.get(`/api/appointments?date=${date}`);
-            const appointments = response.data;
+            currentAppointments = response.data;
 
             loading.classList.add('hidden');
 
@@ -55,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastSyncTime.innerHTML = `تحديث: <span dir="ltr">${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</span>`;
             }
 
-            if (appointments.length === 0) {
+            if (currentAppointments.length === 0) {
                 noData.classList.remove('hidden');
                 appointmentsTable.classList.add('hidden');
                 updateStats([]);
@@ -66,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Always repopulate if we get data
             appointmentsTable.classList.remove('hidden');
             noData.classList.add('hidden');
-            updateStats(appointments);
-            renderTable(appointments);
+            updateStats(currentAppointments);
+            applyFilter(); // instead of renderTable directly
         } catch (error) {
             console.error('Error fetching appointments', error);
             if (!isSilent) {
@@ -79,16 +95,98 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateStats = (appointments) => {
         statTotal.textContent = appointments.length;
-        statCompleted.textContent = appointments.filter(a => a.status === 'completed').length;
-        statPending.textContent = appointments.filter(a => a.status === 'pending' || a.status === 'confirmed').length;
+        statCompleted.textContent = appointments.filter(a => a.status === 'completed' || a.status === 'paid').length;
+        statPending.textContent = appointments.filter(a => a.status === 'pending' || a.status === 'confirmed' || a.status === 'in_progress').length;
         statCancelled.textContent = appointments.filter(a => a.status === 'cancelled').length;
+    };
+
+    window.filterAppointments = (type) => {
+        activeFilter = type;
+        applyFilter();
+    };
+
+    const applyFilter = () => {
+        // Update rings
+        const filters = ['all', 'completed', 'pending', 'cancelled'];
+        filters.forEach(f => {
+            const el = document.getElementById(`filter-${f}`);
+            if (el) {
+                if (f === activeFilter) {
+                    el.classList.add('ring-2');
+                    el.classList.remove('ring-0');
+                } else {
+                    el.classList.remove('ring-2');
+                    el.classList.add('ring-0');
+                }
+            }
+        });
+
+        // Filter data
+        let filtered = currentAppointments;
+        if (activeFilter === 'completed') {
+            filtered = currentAppointments.filter(a => a.status === 'completed' || a.status === 'paid');
+        } else if (activeFilter === 'pending') {
+            filtered = currentAppointments.filter(a => a.status === 'pending' || a.status === 'confirmed' || a.status === 'in_progress');
+        } else if (activeFilter === 'cancelled') {
+            filtered = currentAppointments.filter(a => a.status === 'cancelled');
+        }
+
+        renderTable(filtered);
+        
+        // Update Live Queue Section
+        const todayStr = getTodayStr();
+        const isToday = dateFilter.value === todayStr;
+        const liveQueueSection = document.getElementById('liveQueueSection');
+        
+        if (isToday && currentAppointments.length > 0) {
+            if (liveQueueSection) liveQueueSection.classList.remove('hidden');
+            updateLiveQueue();
+        } else {
+            if (liveQueueSection) liveQueueSection.classList.add('hidden');
+        }
+    };
+
+    const updateLiveQueue = () => {
+        const inProgress = currentAppointments.find(a => a.status === 'in_progress');
+        const waitingList = currentAppointments.filter(a => a.status === 'confirmed');
+        const nextPatient = waitingList[0];
+        
+        const currentPatientName = document.getElementById('currentPatientName');
+        const currentPatientNumber = document.getElementById('currentPatientNumber');
+        const currentPatientLink = document.getElementById('currentPatientLink');
+        const nextPatientBrief = document.getElementById('nextPatientBrief');
+        const callNextBtn = document.getElementById('callNextBtn');
+
+        if (inProgress) {
+            currentPatientName.textContent = inProgress.patient_name;
+            currentPatientNumber.textContent = `#${inProgress.id}`;
+            currentPatientLink.href = `/doctor/patient.html?phone=${encodeURIComponent(inProgress.phone)}`;
+        } else {
+            currentPatientName.textContent = 'لا يوجد مريض حالياً بالداخل';
+            currentPatientNumber.textContent = '-';
+            currentPatientLink.href = '#';
+        }
+
+        if (nextPatient) {
+            nextPatientBrief.innerHTML = `
+                <p class="text-gray-900 font-bold text-lg">${nextPatient.patient_name}</p>
+                <p class="text-indigo-600 font-bold">الدور رقم #${nextPatient.id}</p>
+            `;
+            callNextBtn.disabled = false;
+            callNextBtn.onclick = () => window.updateStatus(nextPatient.id, 'in_progress');
+        } else {
+            nextPatientBrief.innerHTML = `<p class="text-gray-400 italic">لا يوجد مرضى في الانتظار بالخارج</p>`;
+            callNextBtn.disabled = true;
+        }
     };
 
     const getStatusBadge = (status) => {
         switch (status) {
             case 'pending': return `<span class="status-badge status-pending">انتظار</span>`;
-            case 'confirmed': return `<span class="status-badge status-confirmed">مؤكد</span>`;
-            case 'completed': return `<span class="status-badge status-completed">مكتمل</span>`;
+            case 'confirmed': return `<span class="status-badge status-confirmed">مؤكد (في الصالة)</span>`;
+            case 'in_progress': return `<span class="status-badge" style="background-color: #e0e7ff; color: #4338ca;">قيد الفحص</span>`;
+            case 'completed': return `<span class="status-badge status-completed">في انتظار الدفع</span>`;
+            case 'paid': return `<span class="status-badge bg-green-100 text-green-700">مدفوع ومكتمل</span>`;
             case 'cancelled': return `<span class="status-badge status-cancelled">ملغى</span>`;
             default: return `<span class="status-badge bg-gray-100 text-gray-700">${status}</span>`;
         }
@@ -106,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderTable = (appointments) => {
         const rows = appointments.map(app => {
             const time12 = convertTo12HourFormat(app.time);
+            const waitNumber = currentAppointments.findIndex(a => a.id === app.id) + 1;
 
             let actions = '';
 
@@ -117,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
-            if (app.status === 'confirmed' || app.status === 'pending') {
+            if (app.status === 'confirmed' || app.status === 'pending' || app.status === 'in_progress') {
                 actions += `
                     <button onclick="updateStatus(${app.id}, 'completed')" class="text-blue-600 bg-blue-50 hover:bg-blue-100 w-8 h-8 rounded-full flex items-center justify-center transition tooltip" title="إنهاء الموعد (مكتمل)">
                         <i class="fa-solid fa-stethoscope"></i>
@@ -133,10 +232,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             return `
-            <tr class="hover:bg-blue-50/50 transition border-b border-gray-100 last:border-0 group">
+            <tr class="hover:bg-indigo-50/50 transition border-b border-gray-100 last:border-0 group ${app.status === 'confirmed' ? 'bg-indigo-50/30' : ''}">
+                <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold text-xs">
+                        ${waitNumber}
+                    </span>
+                </td>
                 <td class="px-6 py-4 font-bold text-gray-800 whitespace-nowrap" dir="ltr">${time12}</td>
                 <td class="px-6 py-4">
-                    <a href="/patient.html?phone=${encodeURIComponent(app.phone)}" class="group-hover:text-blue-600 transition" title="فتح الملف الطبي">
+                    <a href="/doctor/patient.html?phone=${encodeURIComponent(app.phone)}" class="group-hover:text-blue-600 transition" title="فتح الملف الطبي">
                         <div class="font-medium text-gray-900 flex items-center gap-1 group-hover:underline">
                             ${app.patient_name} <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
                         </div>
@@ -194,12 +298,46 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!result.isConfirmed) return;
         }
 
+        let price = undefined;
+        // Prompt for price if completing
+        if (newStatus === 'completed') {
+            const result = await Swal.fire({
+                title: 'إنهاء الفحص',
+                text: 'يرجى إدخال تكلفة الكشف / العلاج (بالدينار):',
+                input: 'number',
+                inputAttributes: {
+                    min: 0,
+                    step: 100
+                },
+                showCancelButton: true,
+                confirmButtonText: 'إرسال للاستقبال للدفع',
+                cancelButtonText: 'إلغاء',
+                inputValidator: (value) => {
+                    if (!value) return 'الرجاء إدخال السعر!';
+                    if (value < 0) return 'السعر لا يمكن أن يكون سالباً!';
+                }
+            });
+
+            if (!result.isConfirmed) return;
+            price = result.value;
+        }
+
+        // Call Next Logic integration
+        if (newStatus === 'confirmed' && id === 'next') {
+            const waitingList = currentAppointments.filter(a => a.status === 'pending');
+            if (waitingList.length > 0) {
+                id = waitingList[0].id;
+            } else {
+                return;
+            }
+        }
+
         try {
-            const response = await axios.put(`/api/appointments/${id}/status`, { status: newStatus });
+            const response = await axios.put(`/api/appointments/${id}/status`, { status: newStatus, price });
             if (response.data.success) {
                 let txt = 'تم تحديث حالة الموعد بنجاح';
                 if (newStatus === 'confirmed') txt = 'تم تأكيد الموعد بنجاح';
-                if (newStatus === 'completed') txt = 'تم إنهاء الموعد بنجاح (تم الكشف)';
+                if (newStatus === 'completed') txt = 'تم تحويل المريض للاستقبال للدفع';
                 if (newStatus === 'cancelled') txt = 'تم إلغاء الموعد';
 
                 Swal.fire({
@@ -221,9 +359,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Polling setup for Doctor Dashboard (Real-time Simulation)
-    let pollingTimer = null;
-    const SYNC_INTERVAL = 10000; // 10 seconds
+    // Final attachments
+    document.getElementById('finishCurrentBtn').onclick = () => {
+        const inProgress = currentAppointments.find(a => a.status === 'in_progress');
+        if (inProgress) {
+            window.updateStatus(inProgress.id, 'completed');
+        }
+    };
+
+    document.getElementById('callNextBtn').onclick = () => {
+        const pendingList = currentAppointments.filter(a => a.status === 'confirmed');
+        if (pendingList.length > 0) {
+            window.updateStatus(pendingList[0].id, 'in_progress');
+        }
+    };
 
     // Initial load
     fetchAppointments();

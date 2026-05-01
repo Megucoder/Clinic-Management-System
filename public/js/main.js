@@ -33,7 +33,7 @@ function renderPatients(patients) {
     }
 
     list.innerHTML = patients.map(p => `
-        <a href="patient.html?id=${p.id}" class="card" style="text-decoration: none; color: inherit; display: block;">
+        <a href="/doctor/patient.html?id=${p.id}" class="card" style="text-decoration: none; color: inherit; display: block;">
             <div class="d-flex align-center gap-2 mb-4" style="gap: 1rem;">
                 <div class="avatar" style="width: 50px; height: 50px; font-size: 1.5rem;">
                     ${p.name.charAt(0)}

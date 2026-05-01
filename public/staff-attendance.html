@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الموظف | عيادتي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-teal-600 shadow-md sticky top-0 z-10 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-4">
+                    <a href="#" class="flex items-center gap-2 text-xl font-bold text-white hover:text-teal-100">
+                        <i class="fa-solid fa-user-clock text-2xl"></i> بوابة الموظف - الحضور والانصراف
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="welcomeUser" class="font-medium"></span>
+                    <button onclick="logoutUser()" class="text-sm bg-teal-700 hover:bg-teal-800 px-3 py-1 rounded-lg transition">
+                        تسجيل الخروج <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">تسجيل الحضور اليومي</h2>
+            <p class="text-gray-500 mb-6">يرجى تسجيل حضورك فور وصولك للدوام.</p>
+            
+            <button id="checkInBtn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition text-xl flex items-center gap-3 mx-auto">
+                <i class="fa-solid fa-fingerprint text-2xl"></i> أثبت حضوري الآن
+            </button>
+            <p id="checkInStatus" class="mt-4 text-sm font-bold hidden"></p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-list text-teal-600"></i> سجل حضوري
+                </h2>
+            </div>
+            <div class="p-0 overflow-x-auto">
+                <table class="w-full text-right">
+                    <thead class="bg-white border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4 font-bold">التاريخ</th>
+                            <th class="px-6 py-4 font-bold text-center">الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody" class="divide-y divide-gray-100 text-sm">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+                <div id="emptyQueue" class="text-center py-10 hidden">
+                    <p class="text-gray-500 font-medium">لا يوجد سجلات حضور حتى الآن.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/staff-attendance.js"></script>
+</body>
+
+</html>

@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سجل المرضى | أرشيف العيادة</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -126,19 +128,10 @@
 
 <body>
 
-    <header>
-        <a href="/" class="logo">
-            <div class="logo-icon"><i class="fa-solid fa-notes-medical"></i></div>
-            عيادتي
-        </a>
-        <div>
-            <a href="/" class="btn btn-secondary">
-                <i class="fa-solid fa-arrow-right"></i> الرجوع للمنصة
-            </a>
-        </div>
-    </header>
+    <script src="/js/auth.js"></script>
+    <script src="/js/doctor-nav.js"></script>
 
-    <main class="container" style="max-width: 900px; margin-top: 3rem;">
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
         <div class="page-header" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
             <h1 style="color: var(--primary-dark); margin: 0;"><i class="fa-solid fa-folder-open"></i> الأرشيف الشامل
                 للمرضى</h1>
